@@ -106,5 +106,8 @@ venv.bak/
 # .DS_Store
 .DS_Store
 
-# .local
+# misc
 .local
+.config
+.ipython
+.jupyter
