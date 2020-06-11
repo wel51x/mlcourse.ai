@@ -334,7 +334,7 @@ def runModel(train_X, train_y, test_X, test_y, test_X2):
 
 train_y = train_df["target"].values
 
-print("Building model.")
+#print("Building model.")
 cv_scores = []
 pred_full_test = 0
 pred_train = np.zeros([train_df.shape[0]])
@@ -348,8 +348,48 @@ for dev_index, val_index in kf.split(train_df):
     cv_scores.append(metrics.log_loss(val_y, pred_val_y))
     break
 
+results = []
+for thresh in np.arange(0.1, 0.201, 0.01):
+    thresh = np.round(thresh, 2)
+    results.append("F1 score at threshold {0} is {1}".format(thresh,
+                                                             metrics.f1_score(val_y,
+                                                                              (pred_val_y>thresh).astype(int))))
+
+import eli5
+eli5.show_weights(model, vec=tfidf_vec, top=100, feature_filter=lambda x: x != '<BIAS>')
+
 step_end_time = datetime.now()
-print('===>>> StepA duration: {} <<<==='.format(step_end_time - step_start_time))
+print('===>>> StepA duration: {} <<<===\n'.format(step_end_time - step_start_time))
 step_start_time = datetime.now()
 
+for result in results:
+    print(result)
+
 print('\n===>>> Job Duration: {} <<<==='.format(step_end_time - job_start_time))
+
+'''
+===>>> Step1 duration: 0:00:12.857508 <<<===
+===>>> Step2 duration: 0:00:21.014013 <<<===
+===>>> Step3 duration: 0:00:08.353545 <<<===
+===>>> Step4 duration: 0:01:30.313891 <<<===
+===>>> Step5 duration: 0:01:02.267823 <<<===
+===>>> Step6 duration: 0:00:45.869390 <<<===
+===>>> Step7 duration: 0:02:27.163061 <<<===
+===>>> Step8 duration: 0:00:04.432362 <<<===
+===>>> Step9 duration: 0:08:58.389027 <<<===
+===>>> StepA duration: 0:02:38.873963 <<<===
+
+F1 score at threshold 0.1 is 0.5686754495282179
+F1 score at threshold 0.11 is 0.5766919378698225
+F1 score at threshold 0.12 is 0.5837343484402308
+F1 score at threshold 0.13 is 0.5897296495823655
+F1 score at threshold 0.14 is 0.5930953833638397
+F1 score at threshold 0.15 is 0.5957680250783699
+F1 score at threshold 0.16 is 0.596408595819841
+F1 score at threshold 0.17 is 0.596942968279187
+F1 score at threshold 0.18 is 0.5959782669579342
+F1 score at threshold 0.19 is 0.5941635464601137
+F1 score at threshold 0.2 is 0.5927026869499329
+
+===>>> Job Duration: 0:18:09.572186 <<<===
+'''
